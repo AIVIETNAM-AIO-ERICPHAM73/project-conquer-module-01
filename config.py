@@ -1,0 +1,47 @@
+# Import và kế thừa thư viện dataclass, field
+from dataclasses import dataclass, field
+
+# Class gom toàn bộ cấu hình thí nghiệm vào một nơi để notebook và các file .py dùng thống nhất.
+@dataclass
+class ExperimentConfig:
+    """
+    Input: không cần truyền gì nếu dùng default; có thể override từng field khi cần.
+    Output: object cấu hình chứa image_size, batch_size, seeds, ngưỡng chọn factor.
+    """
+
+    # 1. Khai báo kích thước ảnh, số class, batch size, epoch, learning rate.
+    image_size: int = 160
+    num_classes: int = 37
+    batch_size: int = 32
+    max_epochs: int = 8
+    learning_rate: float = 1e-3
+
+    # 2. Khai báo tỷ lệ test/validation và seed khóa test set.
+    test_ratio: float = 0.10
+    val_ratio: float = 0.10
+    val_ratio_from_dev: float = (val_ratio / (1 - test_ratio))
+    test_split_seed: int = 9999
+
+    # 3. Khai báo seed riêng cho screening, full factorial, confirmation.
+    screening_seeds: list[int] = field(default_factory=lambda: [101, 202, 303])
+    full_factorial_seeds: list[int] = field(default_factory=lambda: [404, 505, 606])
+    confirmation_seeds: list[int] = field(default_factory=lambda: [901, 902, 903, 904, 905])
+
+    # 4. Khai báo rule chọn factor và mode preprocessing.
+    min_practical_effect: float = 0.01
+    max_full_factorial_factors: int = 4
+
+    contrast_method: str = "clahe"
+    edge_method: str = "canny"
+    background_mode: str = "blur"
+
+    FACTORS_NAMES = [
+        "A_augmentation",
+        "B_contrast",
+        "C_background",
+        "D_denoise",
+        "E_sharpen",
+        "F_gray",
+        "G_gamma",
+        "H_edge"
+    ]
